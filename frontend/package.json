@@ -1,0 +1,30 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "dependencies": {
+    "grafos-td2": "file:..",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-scripts": "^5.0.0"
+  },
+  "author": "Douglas Rosso",
+  "license": "ISC",
+  "description": "Desenvolvido para matéria de Grafos, onde consiste em implementar uma aplicação que receba uma lista de localidades, onde poderá fazer uma viagem e traçar qual caminho mais barato para seguir, apresentando valores como kilometragem, gasto com combustivel a partir da média informada e valor da gasolina, e gasto com pedágios.",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

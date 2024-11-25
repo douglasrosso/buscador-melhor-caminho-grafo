@@ -1,0 +1,132 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background: rgb(2, 0, 36);
+  background: radial-gradient(
+    circle,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 9, 121, 1) 51%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  color: #333;
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+h1 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #3498db;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+input[type="text"],
+input[type="number"],
+input[list] {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: #3498db;
+}
+
+button.search-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #3498db;
+  color: #fff;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+button.search-button:hover {
+  background-color: #2980b9;
+}
+
+button.search-button:disabled {
+  background-color: #b3c3d3;
+  cursor: not-allowed;
+}
+
+.result {
+  margin-top: 30px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.result h2 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #2ecc71;
+}
+
+.result p {
+  font-size: 16px;
+  margin: 10px 0;
+  color: #555;
+}
+
+.result strong {
+  color: #3498db;
+}
+
+.loading-message {
+  text-align: center;
+  font-size: 18px;
+  color: #444;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+.error-message {
+  margin-top: 5px;
+  color: red;
+}
+
+.input-error {
+  border: 2px solid red !important;
+  color: red;
+}

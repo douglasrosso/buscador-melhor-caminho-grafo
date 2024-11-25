@@ -1,0 +1,21 @@
+{
+  "name": "grafos-td2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install:deps": "npm install && npm --prefix ./frontend install",
+    "dev": "nodemon backend/app.js",
+    "build": "npm --prefix ./frontend run build"
+  },
+  "keywords": [],
+  "author": "Douglas Rosso",
+  "license": "ISC",
+  "description": "Desenvolvido para matéria de Grafos, onde consiste em implementar uma aplicação que receba uma lista de localidades, onde poderá fazer uma viagem e traçar qual caminho mais barato para seguir, apresentando valores como kilometragem, gasto com combustivel a partir da média informada e valor da gasolina, e gasto com pedágios.",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
