@@ -21,12 +21,17 @@ function FuelInput({ label, value, onChange, placeholder, error }) {
         className={error || errorMinValue ? "input-error" : ""}
         id={label}
         value={value}
-        min={0}
-        onChange={onChange}
+        onChange={(e) => {
+          onChange(e);
+          setErrorMinValue("");
+        }}
         placeholder={placeholder}
         onBlur={handleBlur}
       />
       {errorMinValue && <div className="error-message">{errorMinValue}</div>}
+      {error && !errorMinValue && (
+        <div className="error-message">Este campo é obrigatório.</div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,9 @@ function CapitalsInput({ label, value, onChange, capitalsList, error }) {
         id={label}
         name={label}
         value={value}
-        onChange={onChange}
+        onChange={(e) => {
+          onChange(e);
+        }}
         placeholder={`Escolha a ${label}`}
         className={error ? "input-error" : ""}
       />
@@ -18,6 +20,7 @@ function CapitalsInput({ label, value, onChange, capitalsList, error }) {
           <option key={index} value={capital} />
         ))}
       </datalist>
+      {error && <div className="error-message">Este campo é obrigatório.</div>}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import FuelInput from "./components/FuelInput";
 import SearchButton from "./components/SearchButton";
 import Results from "./components/Results";
 import LoadingMessage from "./components/LoadingMessage";
+import Notification from "./components/Notification";
 
 function App() {
   const [start, setStart] = useState("");
@@ -13,6 +14,7 @@ function App() {
   const [capitals, setCapitals] = useState([]);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState("");
 
   const [error, setError] = useState({
     start: false,
@@ -23,9 +25,13 @@ function App() {
 
   useEffect(() => {
     const fetchCapitals = async () => {
-      const response = await fetch("http://localhost:3000/capitals");
-      const data = await response.json();
-      setCapitals(data);
+      try {
+        const response = await fetch("http://localhost:3000/capitals");
+        const data = await response.json();
+        setCapitals(data);
+      } catch {
+        setNotification("Erro ao carregar a lista de capitais.");
+      }
     };
 
     fetchCapitals();
@@ -41,37 +47,60 @@ function App() {
 
     setError(formError);
 
-    if (Object.values(formError).includes(true)) return;
+    if (Object.values(formError).includes(true)) {
+      setNotification("Por favor, preencha todos os campos corretamente.");
+      return;
+    }
 
     setLoading(true);
+    setNotification("");
 
-    const response = await fetch("http://localhost:3000/calculate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        start,
-        end,
-        fuelPrice: parseFloat(fuelPrice),
-        fuelEfficiency: parseFloat(fuelEfficiency),
-      }),
-    });
+    try {
+      const response = await fetch("http://localhost:3000/calculate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start,
+          end,
+          fuelPrice: parseFloat(fuelPrice),
+          fuelEfficiency: parseFloat(fuelEfficiency),
+        }),
+      });
 
-    const data = await response.json();
-    setResult(data.caminhos);
+      if (!response.ok) {
+        const errorData = await response.json();
+        setNotification(errorData.error || "Erro ao calcular o caminho.");
+        setLoading(false);
+        return;
+      }
 
-    setLoading(false);
+      const data = await response.json();
+      setResult(data.caminhos);
+    } catch (err) {
+      setNotification("Erro ao se comunicar com o servidor.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container">
       <h1>Caminho Econômico</h1>
 
+      <Notification
+        message={notification}
+        onClose={() => setNotification("")}
+      />
+
       <CapitalsInput
         label="Origem"
         value={start}
-        onChange={(e) => setStart(e.target.value)}
+        onChange={(e) => {
+          setStart(e.target.value);
+          setError((prev) => ({ ...prev, start: false }));
+        }}
         capitalsList={capitals}
         error={error.start}
       />
@@ -79,7 +108,10 @@ function App() {
       <CapitalsInput
         label="Destino"
         value={end}
-        onChange={(e) => setEnd(e.target.value)}
+        onChange={(e) => {
+          setEnd(e.target.value);
+          setError((prev) => ({ ...prev, end: false }));
+        }}
         capitalsList={capitals}
         error={error.end}
       />
@@ -87,7 +119,10 @@ function App() {
       <FuelInput
         label="Preço do Combustível (R$)"
         value={fuelPrice}
-        onChange={(e) => setFuelPrice(e.target.value)}
+        onChange={(e) => {
+          setFuelPrice(e.target.value);
+          setError((prev) => ({ ...prev, fuelPrice: false }));
+        }}
         placeholder="Digite o preço do combustível"
         error={error.fuelPrice}
       />
@@ -95,7 +130,10 @@ function App() {
       <FuelInput
         label="Autonomia (km/l)"
         value={fuelEfficiency}
-        onChange={(e) => setFuelEfficiency(e.target.value)}
+        onChange={(e) => {
+          setFuelEfficiency(e.target.value);
+          setError((prev) => ({ ...prev, fuelEfficiency: false }));
+        }}
         placeholder="Digite a autonomia do veículo"
         error={error.fuelEfficiency}
       />
