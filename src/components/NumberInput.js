@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function FuelInput({ label, value, onChange, placeholder, error }) {
+function NumberInput({ label, value, onChange, placeholder, error, name }) {
   const [errorMinValue, setErrorMinValue] = useState("");
 
   const handleBlur = () => {
@@ -20,6 +20,7 @@ function FuelInput({ label, value, onChange, placeholder, error }) {
         type="number"
         className={error || errorMinValue ? "input-error" : ""}
         id={label}
+        name={name}
         value={value}
         onChange={(e) => {
           onChange(e);
@@ -36,4 +37,4 @@ function FuelInput({ label, value, onChange, placeholder, error }) {
   );
 }
 
-export default FuelInput;
+export default NumberInput;
