@@ -19,9 +19,8 @@ body {
   justify-content: center;
 }
 
-.container {
-  max-width: 600px;
-  width: 100%;
+#root {
+  width: 80%;
   background-color: #fff;
   padding: 40px;
   border-radius: 12px;
