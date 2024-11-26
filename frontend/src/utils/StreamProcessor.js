@@ -31,6 +31,7 @@ export class StreamProcessor {
             }
           }
         }
+        callback(result);
       },
     };
   }

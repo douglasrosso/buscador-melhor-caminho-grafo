@@ -5,6 +5,8 @@ import SearchButton from "./components/SearchButton";
 import Results from "./components/Results";
 import LoadingMessage from "./components/LoadingMessage";
 import { StreamProcessor } from "./utils/StreamProcessor";
+import Notification from "./components/Notification";
+import NoResult from "./components/NoResult";
 
 function App() {
   const [start, setStart] = useState("");
@@ -14,6 +16,7 @@ function App() {
   const [capitals, setCapitals] = useState([]);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState("");
 
   const [error, setError] = useState({
     start: false,
@@ -24,15 +27,19 @@ function App() {
 
   useEffect(() => {
     const fetchCapitals = async () => {
-      const response = await fetch("http://localhost:3000/capitals");
-      const data = await response.json();
-      setCapitals(data);
+      try {
+        const response = await fetch("http://localhost:3000/capitals");
+        const data = await response.json();
+        setCapitals(data);
+      } catch {
+        setNotification("Erro ao carregar a lista de capitais.");
+      }
     };
 
     fetchCapitals();
   }, []);
 
-  const hasAnyError = (error) => {
+  const isAllFieldsFilled = () => {
     let formError = {
       start: !start,
       end: !end,
@@ -46,12 +53,15 @@ function App() {
   };
 
   const handleSearch = async () => {
-    if (hasAnyError) {
+    if (isAllFieldsFilled()) {
+      setNotification("Por favor, preencha todos os campos corretamente.");
       return;
     }
 
     try {
       setLoading(true);
+      setNotification("");
+      setResult(null);
 
       const streamProcessor = new StreamProcessor();
 
@@ -68,9 +78,18 @@ function App() {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        setNotification(errorData.error || "Erro ao calcular o caminho.");
+        return;
+      }
+
       await streamProcessor
         .process(response)
         .then((result) => setResult([...result]));
+    } catch (e) {
+      setNotification("Erro ao se comunicar com o servidor.");
+      console.log(e);
     } finally {
       setLoading(false);
     }
@@ -80,10 +99,18 @@ function App() {
     <div className="container">
       <h1>Caminho Econômico</h1>
 
+      <Notification
+        message={notification}
+        onClose={() => setNotification("")}
+      />
+
       <CapitalsInput
         label="Origem"
         value={start}
-        onChange={(e) => setStart(e.target.value)}
+        onChange={(e) => {
+          setStart(e.target.value);
+          setError((prev) => ({ ...prev, start: false }));
+        }}
         capitalsList={capitals}
         error={error.start}
       />
@@ -91,7 +118,10 @@ function App() {
       <CapitalsInput
         label="Destino"
         value={end}
-        onChange={(e) => setEnd(e.target.value)}
+        onChange={(e) => {
+          setEnd(e.target.value);
+          setError((prev) => ({ ...prev, end: false }));
+        }}
         capitalsList={capitals}
         error={error.end}
       />
@@ -99,7 +129,10 @@ function App() {
       <FuelInput
         label="Preço do Combustível (R$)"
         value={fuelPrice}
-        onChange={(e) => setFuelPrice(e.target.value)}
+        onChange={(e) => {
+          setFuelPrice(e.target.value);
+          setError((prev) => ({ ...prev, fuelPrice: false }));
+        }}
         placeholder="Digite o preço do combustível"
         error={error.fuelPrice}
       />
@@ -107,7 +140,10 @@ function App() {
       <FuelInput
         label="Autonomia (km/l)"
         value={fuelEfficiency}
-        onChange={(e) => setFuelEfficiency(e.target.value)}
+        onChange={(e) => {
+          setFuelEfficiency(e.target.value);
+          setError((prev) => ({ ...prev, fuelEfficiency: false }));
+        }}
         placeholder="Digite a autonomia do veículo"
         error={error.fuelEfficiency}
       />
@@ -115,8 +151,8 @@ function App() {
       <SearchButton onClick={handleSearch} loading={loading} />
 
       {loading && <LoadingMessage />}
-
-      {result && result.length > 0 && <Results result={result} />}
+      {result?.length === 0 && <NoResult />}
+      {result?.length > 0 && <Results result={result} />}
     </div>
   );
 }

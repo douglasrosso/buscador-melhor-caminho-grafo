@@ -1,22 +1,17 @@
 import React from "react";
 import { VariableSizeList as List } from "react-window";
 
-// Define a function to calculate dynamic heights for each item based on the content.
 const rowHeights = (result) => {
   return result.map((item) => {
-    // Adjust the height dynamically based on the content, for example:
-    return 200 + Math.round(Math.random() * 50); // Randomized height for demonstration
+    return 200 + Math.round(Math.random() * 50);
   });
 };
 
 const Results = ({ result }) => {
-  // Get the row heights for all items
   const heights = rowHeights(result);
 
-  // Get the size of each row based on its index
   const getItemSize = (index) => heights[index];
 
-  // Row rendering component
   const Row = ({ index, style }) => {
     const item = result[index];
     return (
@@ -49,10 +44,10 @@ const Results = ({ result }) => {
     <div className="result">
       <h2>Resultados</h2>
       <List
-        height={500} // Height of the visible area
-        itemCount={result.length} // Total number of items
-        itemSize={getItemSize} // Dynamic item height
-        width="100%" // Full width of the container
+        height={500}
+        itemCount={result.length}
+        itemSize={getItemSize}
+        width="100%"
       >
         {Row}
       </List>
