@@ -1,6 +1,6 @@
 {
-  "watch": ["frontend/src", "frontend/public", "backend"],
-  "ignore": ["frontend/build", "backend/node_modules"],
+  "watch": ["src", "public", "backend"],
+  "ignore": ["build", "node_modules"],
   "ext": "js,css,html",
   "exec": "npm run build && node ./backend/app.js"
 }
