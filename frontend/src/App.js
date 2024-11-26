@@ -4,6 +4,7 @@ import FuelInput from "./components/FuelInput";
 import SearchButton from "./components/SearchButton";
 import Results from "./components/Results";
 import LoadingMessage from "./components/LoadingMessage";
+import { StreamProcessor } from "./utils/StreamProcessor";
 
 function App() {
   const [start, setStart] = useState("");
@@ -31,7 +32,7 @@ function App() {
     fetchCapitals();
   }, []);
 
-  const handleSearch = async () => {
+  const hasAnyError = (error) => {
     let formError = {
       start: !start,
       end: !end,
@@ -41,40 +42,38 @@ function App() {
 
     setError(formError);
 
-    if (Object.values(formError).includes(true)) return;
+    return Object.values(formError).includes(true);
+  };
 
-    setLoading(true);
-
-    const response = await fetch("http://localhost:3000/calculate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        start,
-        end,
-        fuelPrice: parseFloat(fuelPrice),
-        fuelEfficiency: parseFloat(fuelEfficiency),
-      }),
-    });
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let result = [];
-    let done = false;
-
-    while (!done) {
-      const { value, done: readerDone } = await reader.read();
-      done = readerDone;
-      if (value) {
-        const chunk = decoder.decode(value, { stream: true });
-        const paths = chunk.trim().split("\n").map(JSON.parse);
-        result = result.concat(paths.map((p) => p.caminho));
-        setResult([...result]); // Update the UI incrementally
-      }
+  const handleSearch = async () => {
+    if (hasAnyError) {
+      return;
     }
-  
-    setLoading(false);
+
+    try {
+      setLoading(true);
+
+      const streamProcessor = new StreamProcessor();
+
+      const response = await fetch("http://localhost:3000/calculate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start,
+          end,
+          fuelPrice: parseFloat(fuelPrice),
+          fuelEfficiency: parseFloat(fuelEfficiency),
+        }),
+      });
+
+      await streamProcessor
+        .process(response)
+        .then((result) => setResult([...result]));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
