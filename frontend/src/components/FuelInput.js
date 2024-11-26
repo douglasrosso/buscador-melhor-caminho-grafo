@@ -6,7 +6,7 @@ function FuelInput({ label, value, onChange, placeholder, error }) {
   const handleBlur = () => {
     if (parseFloat(value) < 0.1 || isNaN(value)) {
       setErrorMinValue(
-        "O valor deve ser maior ou igual a 0 e não pode conter caracteres especiais."
+        "O valor deve ser maior que 0 e não pode conter caracteres especiais."
       );
     } else {
       setErrorMinValue("");
