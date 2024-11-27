@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function FuelInput({ label, value, onChange, placeholder, error }) {
+function NumberInput({ label, value, onChange, placeholder, error, name }) {
   const [errorMinValue, setErrorMinValue] = useState("");
 
   const handleBlur = () => {
@@ -20,13 +20,19 @@ function FuelInput({ label, value, onChange, placeholder, error }) {
         type="number"
         className={error || errorMinValue ? "input-error" : ""}
         id={label}
+        name={name}
         value={value}
         onChange={(e) => {
+          if (e.target.value > 999999) {
+            return;
+          }
           onChange(e);
           setErrorMinValue("");
         }}
         placeholder={placeholder}
         onBlur={handleBlur}
+        min={1}
+        max={999999}
       />
       {errorMinValue && <div className="error-message">{errorMinValue}</div>}
       {error && !errorMinValue && (
@@ -36,4 +42,4 @@ function FuelInput({ label, value, onChange, placeholder, error }) {
   );
 }
 
-export default FuelInput;
+export default NumberInput;

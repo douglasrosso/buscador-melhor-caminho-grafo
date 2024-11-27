@@ -1,82 +1,71 @@
-import { useState, useEffect } from "react";
-import CapitalsInput from "./components/CapitalsInput";
-import FuelInput from "./components/FuelInput";
-import SearchButton from "./components/SearchButton";
-import Results from "./components/Results";
 import LoadingMessage from "./components/LoadingMessage";
 import { StreamProcessor } from "./utils/StreamProcessor";
+import DataListInput from "./components/DataListInput";
+import SearchButton from "./components/SearchButton";
 import Notification from "./components/Notification";
+import NumberInput from "./components/NumberInput";
 import NoResult from "./components/NoResult";
+import { useState, useEffect } from "react";
+import Results from "./components/Results";
+import PathUtils from "./utils/PathUtils";
 
 function App() {
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [fuelPrice, setFuelPrice] = useState("");
-  const [fuelEfficiency, setFuelEfficiency] = useState("");
+  const [error, setError] = useState(PathUtils.getInitialFormErrors());
+  const [path, setPath] = useState(PathUtils.getInitialInfo());
+  const [notification, setNotification] = useState("");
+  const [loading, setLoading] = useState(false);
   const [capitals, setCapitals] = useState([]);
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [notification, setNotification] = useState("");
 
-  const [error, setError] = useState({
-    start: false,
-    end: false,
-    fuelPrice: false,
-    fuelEfficiency: false,
-  });
+  const clearPageState = () => {
+    setNotification("");
+    setResult(null);
+  };
 
-  useEffect(() => {
-    const fetchCapitals = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/capitals");
-        const data = await response.json();
-        setCapitals(data);
-      } catch {
-        setNotification("Erro ao carregar a lista de capitais.");
-      }
-    };
+  const handleFieldChanged = (e) => {
+    const { name, value } = e.target;
 
-    fetchCapitals();
-  }, []);
+    setPath((prev) => ({ ...prev, [name]: value }));
+    setError((prev) => ({ ...prev, [name]: false }));
+  };
 
-  const isAllFieldsFilled = () => {
-    let formError = {
-      start: !start,
-      end: !end,
-      fuelPrice: !fuelPrice || parseFloat(fuelPrice) <= 0,
-      fuelEfficiency: !fuelEfficiency || parseFloat(fuelEfficiency) <= 0,
-    };
+  const fetchCapitals = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/capitals");
+      const data = await response.json();
+      setCapitals(data);
+    } catch {
+      setNotification("Erro ao carregar a lista de capitais.");
+    }
+  };
 
-    setError(formError);
-
-    return Object.values(formError).includes(true);
+  const postCalculatePaths = async () => {
+    return fetch("http://localhost:3000/calculate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...path,
+        fuelPrice: parseFloat(path.fuelPrice),
+        fuelEfficiency: parseFloat(path.fuelEfficiency),
+      }),
+    });
   };
 
   const handleSearch = async () => {
-    if (isAllFieldsFilled()) {
+    if (PathUtils.isAllFieldsFilled(path, setError)) {
       setNotification("Por favor, preencha todos os campos corretamente.");
       return;
     }
 
     try {
       setLoading(true);
-      setNotification("");
-      setResult(null);
+      clearPageState();
 
       const streamProcessor = new StreamProcessor();
 
-      const response = await fetch("http://localhost:3000/calculate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          start,
-          end,
-          fuelPrice: parseFloat(fuelPrice),
-          fuelEfficiency: parseFloat(fuelEfficiency),
-        }),
-      });
+      const response = await postCalculatePaths();
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -95,6 +84,10 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    fetchCapitals();
+  }, []);
+
   return (
     <div className="container">
       <h1>Caminho Econômico</h1>
@@ -104,46 +97,38 @@ function App() {
         onClose={() => setNotification("")}
       />
 
-      <CapitalsInput
+      <DataListInput
         label="Origem"
-        value={start}
-        onChange={(e) => {
-          setStart(e.target.value);
-          setError((prev) => ({ ...prev, start: false }));
-        }}
+        name="start"
+        value={path.start}
+        onChange={handleFieldChanged}
         capitalsList={capitals}
         error={error.start}
       />
 
-      <CapitalsInput
+      <DataListInput
         label="Destino"
-        value={end}
-        onChange={(e) => {
-          setEnd(e.target.value);
-          setError((prev) => ({ ...prev, end: false }));
-        }}
+        name="end"
+        value={path.end}
+        onChange={handleFieldChanged}
         capitalsList={capitals}
         error={error.end}
       />
 
-      <FuelInput
+      <NumberInput
         label="Preço do Combustível (R$)"
-        value={fuelPrice}
-        onChange={(e) => {
-          setFuelPrice(e.target.value);
-          setError((prev) => ({ ...prev, fuelPrice: false }));
-        }}
+        name="fuelPrice"
+        value={path.fuelPrice}
+        onChange={handleFieldChanged}
         placeholder="Digite o preço do combustível"
         error={error.fuelPrice}
       />
 
-      <FuelInput
+      <NumberInput
         label="Autonomia (km/l)"
-        value={fuelEfficiency}
-        onChange={(e) => {
-          setFuelEfficiency(e.target.value);
-          setError((prev) => ({ ...prev, fuelEfficiency: false }));
-        }}
+        name="fuelEfficiency"
+        value={path.fuelEfficiency}
+        onChange={handleFieldChanged}
         placeholder="Digite a autonomia do veículo"
         error={error.fuelEfficiency}
       />

@@ -1,13 +1,13 @@
 import React from "react";
 
-function CapitalsInput({ label, value, onChange, capitalsList, error }) {
+function DataListInput({ label, value, onChange, capitalsList, error, name }) {
   return (
     <div className="input-group">
       <label htmlFor={label}>{label}:</label>
       <input
         list={`${label}-list`}
         id={label}
-        name={label}
+        name={name}
         value={value}
         onChange={(e) => {
           onChange(e);
@@ -25,4 +25,4 @@ function CapitalsInput({ label, value, onChange, capitalsList, error }) {
   );
 }
 
-export default CapitalsInput;
+export default DataListInput;
