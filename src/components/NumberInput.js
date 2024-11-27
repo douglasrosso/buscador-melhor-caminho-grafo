@@ -23,11 +23,16 @@ function NumberInput({ label, value, onChange, placeholder, error, name }) {
         name={name}
         value={value}
         onChange={(e) => {
+          if (e.target.value > 999999) {
+            return;
+          }
           onChange(e);
           setErrorMinValue("");
         }}
         placeholder={placeholder}
         onBlur={handleBlur}
+        min={1}
+        max={999999}
       />
       {errorMinValue && <div className="error-message">{errorMinValue}</div>}
       {error && !errorMinValue && (
