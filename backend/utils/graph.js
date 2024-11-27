@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 
 function loadGraph() {
-  const filePath = path.join(__dirname, "..", "capitais.json");
+  const filePath = path.join(__dirname, "..", "data", "capitais.json");
   const data = fs.readFileSync(filePath, "utf8");
   const capitalsData = JSON.parse(data);
   const graph = {};
