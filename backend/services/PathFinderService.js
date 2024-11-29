@@ -53,7 +53,10 @@ class PathFinderService {
   getPathsReadableStream(paths) {
     return new Readable({
       read() {
-        for (const path of paths) {
+        const sortedPaths = [...paths].sort(
+          (a, b) => a.totalCost - b.totalCost
+        );
+        for (const path of sortedPaths) {
           this.push(JSON.stringify({ caminho: path }) + "\n");
         }
         this.push(null);
